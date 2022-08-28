@@ -1,5 +1,3 @@
-package entities;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,10 +14,10 @@ public class Curso {
     private String nome;
     private LocalDate dataCriacao;
     private String descricao;
-    
+
     private List<Turma> turmas;
     private List<Professor> professores;
-    
+
     private static int geradorTurma = 0;
 
     public Curso(int codigo, String nome, String dataCriacao, String descricao) {
@@ -30,33 +28,33 @@ public class Curso {
         this.turmas = new ArrayList<>();
         this.professores = new ArrayList<>();
     }
-    
+
     public static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
+
     public Optional<Turma> buscarTurma(int codigo) {
         return turmas.stream()
                      .filter(t -> t.getCodigo() == codigo)
                      .findFirst();
     }
-    
+
     public boolean addTurma(String nome, int qtdVagas, Professor prof) {
         return turmas.add(new Turma(++geradorTurma, nome, qtdVagas, prof));
     }
-    
+
     public Optional<Professor> buscarProfessor(String matricula) {
         return professores.stream()
                           .filter(p -> p.getMatricula()
-                          .equalsIgnoreCase(matricula))
+                                        .equalsIgnoreCase(matricula))
                           .findFirst();
     }
-    
+
     public String matriculadasAluno(String matricula) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Matrícula: ").append(matricula).append("\n")
-        .append(turmas.stream()
-                      .filter(t -> !t.buscarAluno(matricula).isEmpty())
-                      .map(Turma::toString)
-                      .collect(Collectors.joining("\n")));
+        sb.append("MatrÃ­cula: ").append(matricula).append("\n")
+          .append(turmas.stream()
+                        .filter(t -> !t.buscarAluno(matricula).isEmpty())
+                        .map(Turma::toString)
+                        .collect(Collectors.joining("\n")));
         return sb.toString();
     }
 
@@ -75,7 +73,7 @@ public class Curso {
     public String getDescricao() {
         return descricao;
     }
-    
+
     public List<Professor> getProfessores() {
         return professores;
     }
@@ -85,16 +83,16 @@ public class Curso {
                      .map(Turma::infosCompletaTurma)
                      .collect(Collectors.joining("\n\n"));
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getCodigo()).append(" - ").append(getNome())
-        .append(", Criação: ").append(getDataCriacao().format(dtf)).append(", ")
-        .append(getDescricao()).append("\n")
-        .append("\nTurmas:\n")
-        .append(listarTurmas());
-        
+          .append(", CriaÃ§Ã£o: ").append(getDataCriacao().format(dtf)).append(", ")
+          .append(getDescricao()).append("\n")
+          .append("\nTurmas:\n")
+          .append(listarTurmas());
+
         return sb.toString();
     }
 }
