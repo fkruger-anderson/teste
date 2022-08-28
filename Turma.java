@@ -1,10 +1,8 @@
-package entities;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
@@ -17,7 +15,7 @@ public class Turma {
     private int qtdVagas;
     private List<Aluno> alunos;
     private Professor professor;
-    private Map<Aluno, Double> notas;
+    private Map<String, Double> notas;
 
     public Turma(int codigo, String nome, int qtdVagas, Professor professor) {
         this.codigo = codigo;
@@ -25,9 +23,9 @@ public class Turma {
         this.qtdVagas = qtdVagas;
         this.alunos = new ArrayList<>();
         this.professor = professor;
-        this.notas = new TreeMap<>();
+        this.notas = new HashMap<>();
     }
-    
+
     public int getCodigo() {
         return codigo;
     }
@@ -39,11 +37,15 @@ public class Turma {
     public int getQtdVagas() {
         return qtdVagas;
     }
-    
+
     public List<Aluno> getAlunos() {
         return alunos;
     }
-    
+
+    public Map<String, Double> getNotas() {
+        return notas;
+    }
+
     public Optional<Aluno> buscarAluno(String matricula) {
         return alunos.stream()
                      .filter(a -> a.getMatricula().equalsIgnoreCase(matricula))
@@ -55,10 +57,10 @@ public class Turma {
                      .map(Pessoa::toString)
                      .collect(Collectors.joining("\n"));
     }
-    
+
     public String infosCompletaTurma() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.toString())
+        sb.append(this)
           .append(":\n").append(alunosInscritos());
         return sb.toString();
     }
