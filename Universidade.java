@@ -2,7 +2,6 @@ package entities;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,13 +96,13 @@ public class Universidade {
         }
     }
 
-    public Map<String, Double> calcMediaAlunos(int codCurso, int codTurma) {
+    public Map<Aluno, Double> calcMediaAlunos(int codCurso, int codTurma) {
         Curso curso = this.buscarCurso(codCurso).orElse(null);
         Turma turma = curso.buscarTurma(codTurma).orElse(null);
         
-        Map<String, Double> medias = turma.getNotas()
+        Map<Aluno, Double> medias = turma.getNotas()
                                           .stream()
-                                          .collect(Collectors.groupingBy(a -> a.getAluno().getNome(), 
+                                          .collect(Collectors.groupingBy(a -> a.getAluno(), 
                                                    Collectors.averagingDouble(Nota::getNota)));
         
         /*System.out.println("Médias por aluno:");
@@ -114,11 +113,12 @@ public class Universidade {
         return medias;
     }
     
-    public Map<String, Double> mediasOrdemAlfabetica(int codCurso, int codTurma) {
-        Map<String, Double> ordemAlfabetica = this.calcMediaAlunos(codCurso, codTurma)
+    public Map<Aluno, Double> mediasOrdemAlfabetica(int codCurso, int codTurma) {
+        Map<Aluno, Double> ordemAlfabetica = this.calcMediaAlunos(codCurso, codTurma)
                                                   .entrySet()
                                                   .stream()
-                                                  .sorted(Map.Entry.comparingByKey())
+                                                  .sorted((o1, o2)->o1.getKey().getNome().
+                                                          compareTo(o2.getKey().getNome()))
                                                   .collect(Collectors.toMap(
                                                           Entry::getKey, 
                                                           Entry::getValue, 
@@ -126,18 +126,19 @@ public class Universidade {
                                                           LinkedHashMap::new));
         
         System.out.println("Médias por aluno - Ordem alfabética:");
-        for (Map.Entry<String, Double> notas : ordemAlfabetica.entrySet()) {
-            System.out.printf("%s - %.2f\n", notas.getKey(), notas.getValue());
+        for (Entry<Aluno, Double> notas : ordemAlfabetica.entrySet()) {
+            System.out.printf("%s - %.2f\n", notas.getKey().getNome(), notas.getValue());
         }
         
         return ordemAlfabetica;
     }
     
-    public Map<String, Double> mediasOrdemDesempenho(int codCurso, int codTurma) {
-        Map<String, Double> ordemDesempenhoa = this.calcMediaAlunos(codCurso, codTurma)
+    public Map<Aluno, Double> mediasOrdemDesempenho(int codCurso, int codTurma) {
+        Map<Aluno, Double> ordemDesempenhoa = this.calcMediaAlunos(codCurso, codTurma)
                 .entrySet()
                 .stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .sorted((o1, o2)->o2.getValue().
+                        compareTo(o1.getValue()))
                 .collect(Collectors.toMap(
                         Entry::getKey, 
                         Entry::getValue, 
@@ -145,8 +146,8 @@ public class Universidade {
                         LinkedHashMap::new));
         
         System.out.println("Médias por aluno - Por desempenho:");
-        for (Map.Entry<String, Double> notas : ordemDesempenhoa.entrySet()) {
-            System.out.printf("%s - %.2f\n", notas.getKey(), notas.getValue());
+        for (Map.Entry<Aluno, Double> notas : ordemDesempenhoa.entrySet()) {
+            System.out.printf("%s - %.2f\n", notas.getKey().getNome(), notas.getValue());
         }
         
         return ordemDesempenhoa;
