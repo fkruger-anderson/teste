@@ -1,11 +1,15 @@
+package entities;
+
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.averagingDouble;
-import static java.util.stream.Collectors.groupingBy;
 
 /**
  *
@@ -71,7 +75,7 @@ public class Universidade {
             if (turma.getAlunos().size() + 1 <= turma.getQtdVagas() && !turma.getAlunos().contains(aluno)) {
                 return turma.getAlunos().add(aluno);
             } else {
-                System.out.println("Excedeu os limites da turma, ou o aluno já encontra-se matriculado.");
+                System.out.println("Excedeu o limite de inscritos da turma, ou o aluno já encontra-se matriculado.");
                 return false;
             }
         } else  {
@@ -86,32 +90,79 @@ public class Universidade {
         Aluno aluno = turma.buscarAluno(matricula).orElse(null);
 
         if (aluno != null) {
-            turma.getNotas().put(String.format("%s - %s", aluno.getMatricula(), aluno.getNome()), nota);
-            return true;
+            return turma.getNotas().add(new Nota(aluno, this, curso, turma, nota));
         } else {
             System.out.println("Dados não encontrados nesta Universidade.");
             return false;
         }
     }
 
-    public void calcMediaAlunos(int codCurso, int codTurma) {
+    public Map<String, Double> calcMediaAlunos(int codCurso, int codTurma) {
         Curso curso = this.buscarCurso(codCurso).orElse(null);
         Turma turma = curso.buscarTurma(codTurma).orElse(null);
-        Map<String, Double> notas = turma.getNotas();
-
-//        Map<String,Double> average =
-//                notas.entrySet().stream()
-//                     .collect(Collectors.groupingBy(Map.Entry::getKey,
-//                             Collectors.averagingDouble(value -> value.getValue())));
-        Map<String,Double> average =
-                notas.entrySet().stream()
-                     .collect(groupingBy(Map.Entry::getKey,
-                             averagingDouble(value -> value.getValue())));
-
-        for (Map.Entry<String, Double> entry : average.entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue());
+        
+        Map<String, Double> medias = turma.getNotas()
+                                          .stream()
+                                          .collect(Collectors.groupingBy(a -> a.getAluno().getNome(), 
+                                                   Collectors.averagingDouble(Nota::getNota)));
+        
+        /*System.out.println("Médias por aluno:");
+        for (Map.Entry<String, Double> notas : medias.entrySet()) {
+            System.out.printf("%s - %.2f\n", notas.getKey(), notas.getValue());
+        }*/
+        
+        return medias;
+    }
+    
+    public Map<String, Double> mediasOrdemAlfabetica(int codCurso, int codTurma) {
+        Map<String, Double> ordemAlfabetica = this.calcMediaAlunos(codCurso, codTurma)
+                                                  .entrySet()
+                                                  .stream()
+                                                  .sorted(Map.Entry.comparingByKey())
+                                                  .collect(Collectors.toMap(
+                                                          Entry::getKey, 
+                                                          Entry::getValue, 
+                                                          (e1, e2) -> e1, 
+                                                          LinkedHashMap::new));
+        
+        System.out.println("Médias por aluno - Ordem alfabética:");
+        for (Map.Entry<String, Double> notas : ordemAlfabetica.entrySet()) {
+            System.out.printf("%s - %.2f\n", notas.getKey(), notas.getValue());
         }
-
+        
+        return ordemAlfabetica;
+    }
+    
+    public Map<String, Double> mediasOrdemDesempenho(int codCurso, int codTurma) {
+        Map<String, Double> ordemDesempenhoa = this.calcMediaAlunos(codCurso, codTurma)
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Entry::getKey, 
+                        Entry::getValue, 
+                        (e1, e2) -> e1, 
+                        LinkedHashMap::new));
+        
+        System.out.println("Médias por aluno - Por desempenho:");
+        for (Map.Entry<String, Double> notas : ordemDesempenhoa.entrySet()) {
+            System.out.printf("%s - %.2f\n", notas.getKey(), notas.getValue());
+        }
+        
+        return ordemDesempenhoa;
+    }
+    
+    public Set<Aluno> alunosInscritos(int codCurso) {
+        Curso curso = this.buscarCurso(codCurso).orElse(null);
+        Set<Aluno> alunosInscritos = curso.getTurmas()
+                                          .stream()
+                                          .map(Turma::getAlunos)
+                                          .flatMap(Collection::stream)
+                                          .collect(Collectors.toSet());
+        
+        alunosInscritos.forEach(a -> System.out.printf("%s - %s\n", a.getMatricula(), a.getNome()));
+        
+        return alunosInscritos;
     }
 
     @Override
@@ -119,7 +170,9 @@ public class Universidade {
         StringBuilder sb = new StringBuilder();
         sb.append("Universidade: ").append(getNome())
           .append("; CNPJ: ").append(getCNPJ())
-          .append("\n\nCursos: \n").append(cursos.stream().map(Curso::toString).collect(Collectors.joining("\n\n")));
+          .append("\n\nCursos: \n").append(cursos.stream()
+                                                 .map(Curso::toString)
+                                                 .collect(Collectors.joining("\n\n")));
         return sb.toString();
     }
 }
