@@ -1,3 +1,5 @@
+package entities;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -76,6 +78,10 @@ public class Curso {
 
     public List<Professor> getProfessores() {
         return professores;
+    }
+
+    public List<Turma> getTurmas() {
+        return turmas;
     }
 
     public String listarTurmas() {
