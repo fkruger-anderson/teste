@@ -1,7 +1,7 @@
+package entities;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -15,7 +15,7 @@ public class Turma {
     private int qtdVagas;
     private List<Aluno> alunos;
     private Professor professor;
-    private Map<String, Double> notas;
+    private List<Nota> notas;
 
     public Turma(int codigo, String nome, int qtdVagas, Professor professor) {
         this.codigo = codigo;
@@ -23,7 +23,7 @@ public class Turma {
         this.qtdVagas = qtdVagas;
         this.alunos = new ArrayList<>();
         this.professor = professor;
-        this.notas = new HashMap<>();
+        this.notas = new ArrayList<>();
     }
 
     public int getCodigo() {
@@ -41,8 +41,8 @@ public class Turma {
     public List<Aluno> getAlunos() {
         return alunos;
     }
-
-    public Map<String, Double> getNotas() {
+    
+    public List<Nota> getNotas() {
         return notas;
     }
 
