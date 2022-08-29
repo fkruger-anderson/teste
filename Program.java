@@ -1,3 +1,8 @@
+package application;
+
+import entities.Aluno;
+import entities.Universidade;
+
 public class Program {
     public static void main(String[] args) {
         Universidade uni1 = new Universidade("UDESC", "01.768.417.0001/61");
@@ -32,6 +37,12 @@ public class Program {
         uni1.registrarNotaAluno(1, 1, "A19931", 6.0);
 
         uni1.calcMediaAlunos(1,1);
+        System.out.println();
+        uni1.mediasOrdemAlfabetica(1,1);
+        System.out.println();
+        uni1.mediasOrdemDesempenho(1,1);
+        System.out.println();
+        uni1.alunosInscritos(1);
 
     }
 }
